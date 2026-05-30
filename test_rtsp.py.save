@@ -1,0 +1,69 @@
+import cv2
+import time
+import sys
+from datetime import datetime
+
+# 你的 RTSP 地址
+RTSP_URL = "rtsp://admin:zaq1xsw2@192.168.3.220:554/h264/ch1/sub/av_stream"
+
+def main():
+    print("开始测试 RTSP 连接...")
+    print("RTSP:", RTSP_URL)
+
+    # 尝试用 FFmpeg 后端打开
+    cap = cv2.VideoCapture(RTSP_URL, cv2.CAP_FFMPEG)
+
+    if not cap.isOpened():
+        print("打开失败：VideoCapture 没有成功连接到 RTSP")
+        sys.exit(1)
+
+    print("连接成功，开始读取画面...")
+
+    frame_count = 0
+    start_time = time.time()
+    saved = False
+
+    while True:
+        ret, frame = cap.read()
+
+        if not ret or frame is None:
+            print("读取失败，正在重试...")
+            time.sleep(1)
+            frame_count += 1
+            if frame_count > 10:
+                print("连续读取失败，退出。")
+                break
+            continue
+
+        frame_count += 1
+        h, w = frame.shape[:2]
+        elapsed = time.time() - start_time
+        print(f"第 {frame_count} 帧读取成功，分辨率: {w}x{h}, 用时: {elapsed:.2f}s")
+
+        # 保存第一张成功读取的图片
+        if not saved:
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            out_name = f"rtsp_test_{ts}.jpg"
+            cv2.imwrite(out_name, frame)
+            print(f"已保存测试截图: {out_name}")
+            saved = True
+
+        # 显示窗口（如果你通过 MobaXterm 开了 X11 转发，这里会弹窗）
+        cv2.imshow("RTSP Test", frame)
+
+        # 按 q 退出
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            print("手动退出。")
+            break
+
+        # 读到 30 帧就结束，避免一直跑
+        if frame_count >= 30:
+            print("已成功读取 30 帧，测试结束。")
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+    print("资源已释放，测试完成。")
+
+if __name__ == "__main__":
+    main()
