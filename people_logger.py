@@ -45,7 +45,7 @@ IMAGE_DIR = "/home/pi/jtz/yolo_v6/logs/images"
 CSV_PATH = "/home/pi/jtz/yolo_v6/logs/people_log.csv"
 
 # 置信度阈值
-CONF_THRES = 0.25
+CONF_THRES = 0.4
 
 # NMS 去重阈值
 NMS_THRES = 0.45
