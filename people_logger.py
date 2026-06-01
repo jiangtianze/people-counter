@@ -7,7 +7,7 @@ import onnxruntime as ort
 from datetime import datetime
 
 
-RETENTION_DAYS = 1
+RETENTION_DAYS = 7
 last_cleanup_date = None
 
 def cleanup_old_images():
@@ -26,7 +26,7 @@ def cleanup_old_images():
                 removed +=1
             except Exception as e:
                 print(f"删除失败:{path} -> {e}")
-    print(f"清理完成，删除了 {removed}张1天前的照片")
+    print(f"清理完成，删除了 {removed}张7天前的照片")
 
 
 # ==========================================
