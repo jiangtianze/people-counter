@@ -16,6 +16,29 @@
 
     <h1 style="text-align:center;" >实验室人数监控</h1>
 
+
+    <div style="text-align:center;">
+
+    {% if status == "在线" %}
+
+    <h2 style="color:#00ff00;">
+        ● 在线
+    </h2>
+
+    {% else %}
+
+    <h2 style="color:#ff4444;">
+        ● 离线
+    </h2>
+
+    {% endif %}
+
+    <h3>
+    最后更新：{{ latest_time }}
+    </h3>
+
+    </div>
+
     <div style="
         display:flex;
         justify-content:center;
@@ -64,8 +87,7 @@
 
     </div>
 
-    <h3>最新更新时间: {{ latest_time }}</h3>
-    <h2>最新检测截图</h2>
+    <h2 style="text-align:center;">最新检测截图</h2>
     <div style="text-align:center;">
         <img
             src="/latest_image"

@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, render_template,send_file
 import pandas as pd
 import os
@@ -28,6 +29,21 @@ def index():
 
     latest_time = times[-1] if times else "暂无数据"
  
+    status = "离线"
+
+    if times:
+        last_update = datetime.strptime(
+            latest_time,
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+        seconds = (
+            datetime.now() - last_update
+        ).total_seconds()
+
+        if seconds < 300:
+            status = "在线"
+
     max_count = max(counts) if counts else 0
 
     avg_count = round(sum(counts) / len(counts), 1) if counts else 0
@@ -53,7 +69,8 @@ def index():
         latest_time=latest_time,
         max_count=max_count,
         avg_count=avg_count,
-        recent_records=recent_records
+        recent_records=recent_records,
+        status=status
 
     )
 
