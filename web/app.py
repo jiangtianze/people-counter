@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, render_template,send_file
+from flask import Flask, render_template,send_file,jsonify
 import pandas as pd
 import os
 
@@ -15,6 +15,40 @@ def latest_image():
     image_path = df.iloc[-1, 2]
 
     return send_file(image_path)
+
+@app.route("/api/status")
+def api_status():
+
+    df = pd.read_csv(CSV_PATH)
+
+    if len(df) == 0:
+        return jsonify({
+            "count": 0,
+            "time": "",
+            "status": "离线"
+        })
+
+    current_count = int(df.iloc[-1,1])
+    latest_time = str(df.iloc[-1,0])
+
+    return jsonify({
+        "count": current_count,
+        "time": latest_time,
+        "status": "在线"
+    })
+
+@app.route("/api/chart")
+def api_chart():
+
+    df = pd.read_csv(CSV_PATH)
+
+    times = df["timestamp"].tail(50).tolist()
+    counts = df["people_count"].tail(50).tolist()
+
+    return jsonify({
+        "times": times,
+        "counts": counts
+    })
 
 CSV_PATH = os.path.expanduser("~/jtz/yolo_v6/logs/people_log.csv")
 

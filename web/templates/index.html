@@ -181,6 +181,38 @@
             ]
         };
         chart.setOption(option);
+
+        function refreshChart() {
+
+            fetch('/api/chart')
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                chart.setOption({
+
+                    xAxis:{
+                        data:data.times
+                    },
+
+                    series:[
+                        {
+                            data:data.counts
+                        }
+                    ]
+
+                });
+
+            });
+
+        }
+
+        // 每10秒刷新一次趋势图
+        setInterval(refreshChart,10000);
+
+</script>
+
     </script>
 
 </body>
