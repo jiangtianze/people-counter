@@ -1,9 +1,18 @@
 from datetime import datetime
-from flask import Flask, render_template,send_file,jsonify
+from flask import Flask, render_template, send_file, jsonify
 import pandas as pd
 import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from predictor import predict_next_hours
 
 app = Flask(__name__)
+
+CSV_PATH = os.environ.get(
+    "PEOPLE_CSV_PATH",
+    os.path.expanduser("~/jtz/yolo_v6/logs/people_log.csv"),
+)
 
 @app.route("/latest_image")
 def latest_image():
@@ -37,6 +46,11 @@ def api_status():
         "status": "在线"
     })
 
+@app.route("/api/predict")
+def api_predict():
+    result = predict_next_hours(CSV_PATH, hours=12)
+    return jsonify(result)
+
 @app.route("/api/chart")
 def api_chart():
 
@@ -49,8 +63,6 @@ def api_chart():
         "times": times,
         "counts": counts
     })
-
-CSV_PATH = os.path.expanduser("~/jtz/yolo_v6/logs/people_log.csv")
 
 @app.route("/")
 def index():

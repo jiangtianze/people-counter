@@ -140,8 +140,26 @@
         ">
     </div>
 
+    <h2 style="text-align:center;margin-top:30px;">未来 12 小时人数预测</h2>
+    <p id="predict-desc" style="text-align:center;color:#aaa;font-size:14px;">
+        基于长期历史「星期 × 小时」典型规律（中位数），抗异常波动
+    </p>
+
+    <div
+         id="forecast-chart"
+         style="
+            width:90%;
+            height:450px;
+            margin:20px auto;
+            background:#1f1f1f;
+            border-radius:10px;
+            padding:10px;
+        ">
+    </div>
+
     <script>
         var chart = echarts.init(document.getElementById('chart'));
+        var forecastChart = echarts.init(document.getElementById('forecast-chart'));
 
         var option = {
 
@@ -211,9 +229,83 @@
         // 每10秒刷新一次趋势图
         setInterval(refreshChart,10000);
 
-</script>
+        var forecastOption = {
+            backgroundColor:'#1f1f1f',
+            title:{
+                text:'未来 12 小时预测（每小时）',
+                textStyle:{ color:'#ffffff' }
+            },
+            tooltip:{
+                trigger:'axis',
+                formatter: function(params) {
+                    var p = params[0];
+                    return p.name + '<br/>预测人数: ' + p.value;
+                }
+            },
+            grid:{ left:'8%', right:'5%', bottom:'15%', top:'15%' },
+            xAxis:{
+                type:'category',
+                data:[],
+                axisLabel:{ color:'#ffffff', rotate:35 }
+            },
+            yAxis:{
+                type:'value',
+                name:'人数',
+                nameTextStyle:{ color:'#aaa' },
+                axisLabel:{ color:'#ffffff' },
+                min:0
+            },
+            series:[{
+                name:'预测人数',
+                type:'line',
+                smooth:true,
+                symbol:'circle',
+                symbolSize:8,
+                lineStyle:{ width:3, color:'#4fc3f7' },
+                itemStyle:{ color:'#4fc3f7' },
+                areaStyle:{
+                    color:{
+                        type:'linear',
+                        x:0, y:0, x2:0, y2:1,
+                        colorStops:[
+                            { offset:0, color:'rgba(79,195,247,0.35)' },
+                            { offset:1, color:'rgba(79,195,247,0.02)' }
+                        ]
+                    }
+                },
+                data:[]
+            }]
+        };
+        forecastChart.setOption(forecastOption);
 
-    </script>
+        function refreshForecast() {
+            fetch('/api/predict')
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                var desc = document.getElementById('predict-desc');
+                if (!data.ok) {
+                    desc.textContent = data.message || '暂无预测数据';
+                    forecastChart.setOption({
+                        xAxis:{ data:[] },
+                        series:[{ data:[] }]
+                    });
+                    return;
+                }
+                var meta = data.meta || {};
+                desc.textContent = data.method_desc
+                    + ' | 历史样本: ' + (meta.raw_records || 0) + ' 条'
+                    + ' | 覆盖: ' + (meta.history_start || '') + ' ~ ' + (meta.history_end || '');
+                forecastChart.setOption({
+                    xAxis:{ data: data.labels || data.times },
+                    series:[{ data: data.counts }]
+                });
+            });
+        }
+
+        refreshForecast();
+        setInterval(refreshForecast, 60000);
+
+</script>
 
 </body>
 </html>
