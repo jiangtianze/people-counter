@@ -1,0 +1,27 @@
+[Unit]
+Description=YOLOv6 People Logger Service (main stream, lightweight)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/jtz/yolo_v6
+
+# 开机延迟 60 秒，便于先 SSH 登录排查
+ExecStartPre=/bin/sleep 60
+ExecStart=/home/pi/yolov6_env/bin/python /home/pi/jtz/yolo_v6/people_logger.py
+
+Restart=always
+RestartSec=30
+
+# 降低优先级，避免占满 CPU 导致 SSH 无法登录
+Nice=10
+CPUQuota=75%
+MemoryMax=450M
+
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
