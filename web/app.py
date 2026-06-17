@@ -64,6 +64,37 @@ def api_chart():
         "counts": counts
     })
 
+@app.route("/history")
+def history():
+
+    image_dir = os.path.expanduser(
+        "~/jtz/yolo_v6/logs/images"
+    )
+
+    images = sorted(
+        os.listdir(image_dir),
+        reverse=True
+    )
+
+    return render_template(
+        "history.html",
+        images=images
+    )
+
+@app.route("/image/<filename>")
+def show_image(filename):
+
+    image_dir = os.path.expanduser(
+        "~/jtz/yolo_v6/logs/images"
+    )
+
+    image_path = os.path.join(
+        image_dir,
+        filename
+    )
+
+    return send_file(image_path)
+
 @app.route("/")
 def index():
     df = pd.read_csv(CSV_PATH)

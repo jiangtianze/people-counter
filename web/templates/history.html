@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8">
+
+<title>历史截图</title>
+
+<style>
+
+body{
+    background:#111;
+    color:white;
+    text-align:center;
+    font-family:Arial;
+}
+
+a{
+    color:#00ff99;
+    text-decoration:none;
+}
+
+img{
+    max-width:90%;
+    margin-top:20px;
+    border-radius:10px;
+}
+
+.container{
+    margin-top:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>历史截图浏览</h1>
+
+<a href="/">返回主页</a>
+
+<div class="container">
+
+{% for image in images[:30] %}
+
+<div style="margin:10px">
+
+<a href="/image/{{ image }}">
+{{ image }}
+</a>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</body>
+</html>
